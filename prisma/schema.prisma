@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String      @id @default(uuid())
+  email     String      @unique
+  password  String
+  role      String      @default("user")
+  trips     TripPlan[]
+  badges    UserBadge[]
+  createdAt DateTime    @default(now())
+}
+
+model Landmark {
+  id           String      @id @default(uuid())
+  name         String
+  municipality String
+  description  String
+  images       String[]
+  latitude     Float
+  longitude    Float
+  
+  // Game & Badge integration
+  gameType     String      @default("quiz") // Tells Flame which mini-game to load
+  badgeImage   String?     // URL to the badge asset
+  
+  trips        TripPlan[]
+  earnedBy     UserBadge[]
+  updatedAt    DateTime    @updatedAt
+}
+
+model TripPlan {
+  id         String   @id @default(uuid())
+  userId     String
+  landmarkId String
+  addedAt    DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  landmark   Landmark @relation(fields: [landmarkId], references: [id])
+
+  @@unique([userId, landmarkId]) // A user can only add a place once
+}
+
+model UserBadge {
+  id         String   @id @default(uuid())
+  userId     String
+  landmarkId String
+  earnedAt   DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  landmark   Landmark @relation(fields: [landmarkId], references: [id])
+
+  @@unique([userId, landmarkId]) // A user earns one badge per location
+}

@@ -1,20 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PlacesModule } from './places/places.module';
+import { PrismaService } from './prisma.service';
 
 @Module({
-  imports: [
-    // This magically loads your .env file and makes it available everywhere
-    ConfigModule.forRoot({ 
-      isGlobal: true,
-    }),
-    
-    // Import your newly created AuthModule
-    AuthModule,
-    
-    PlacesModule, 
-  ],
-  providers: [],
+  imports: [AuthModule, PlacesModule],
+  controllers: [],
+  providers: [PrismaService],
+  exports: [PrismaService], // Export so PlacesService can use it
 })
 export class AppModule {}
