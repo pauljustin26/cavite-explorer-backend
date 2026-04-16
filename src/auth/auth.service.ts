@@ -3,15 +3,16 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AuthService {
   
-  async getUserProfile(userId: string) {
-    // 🚧 LATER: You will use your ORM (Prisma/TypeORM/Drizzle) here 
-    // to fetch the user's saved trips and badges from your Neon Postgres DB.
-    // Example: return await this.prisma.user.findUnique({ where: { id: userId } });
-    
+  async getUserProfile(userId: string, email?: string, role?: string) {
+    const finalRole = role || 'user';
+
+    console.log(`Login Check -> UserID: ${userId} | Role: ${finalRole}`);
+
     return {
       userId: userId,
+      email: email || 'Email not provided',
+      role: finalRole, 
       status: 'Authenticated',
-      message: 'Ready to explore Cavite and earn badges!',
     };
   }
 }

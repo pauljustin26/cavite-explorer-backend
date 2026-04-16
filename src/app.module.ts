@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { PlacesModule } from './places/places.module';
 
 @Module({
   imports: [
@@ -10,7 +11,9 @@ import { AuthModule } from './auth/auth.module';
     }),
     
     // Import your newly created AuthModule
-    AuthModule, 
+    AuthModule,
+    
+    PlacesModule, 
   ],
   providers: [],
 })

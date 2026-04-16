@@ -24,7 +24,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   // Once the token is verified, this payload is injected into the Request object
   async validate(payload: any) {
-    // You can attach more data here if needed (e.g., fetching user roles from the DB)
-    return { userId: payload.sub, email: payload.email };
+    // Let's print the payload to the terminal so we can see exactly what Neon is sending!
+    console.log('Neon JWT Payload:', payload); 
+    
+    // Pass the email AND the role to the request object
+    return { 
+      userId: payload.sub, 
+      email: payload.email,
+      role: payload.role // Grabbing the role you set in the console!
+    };
   }
 }
