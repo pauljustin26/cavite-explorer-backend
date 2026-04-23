@@ -11,6 +11,14 @@ model User {
   id        String      @id @default(uuid())
   email     String      @unique
   password  String
+  
+  // --- NEW PROFILE FIELDS ---
+  name      String?     
+  mobile    String?     
+  birthday  String?     
+  sex       String?     
+  // --------------------------
+
   role      String      @default("user")
   trips     TripPlan[]
   badges    UserBadge[]
@@ -23,12 +31,12 @@ model Landmark {
   municipality String
   description  String
   images       String[]
+  category     String      @default("Recommended") 
   latitude     Float
   longitude    Float
   
-  // Game & Badge integration
-  gameType     String      @default("quiz") // Tells Flame which mini-game to load
-  badgeImage   String?     // URL to the badge asset
+  gameType     String      @default("quiz") 
+  badgeImage   String?     
   
   trips        TripPlan[]
   earnedBy     UserBadge[]
@@ -44,7 +52,7 @@ model TripPlan {
   user       User     @relation(fields: [userId], references: [id])
   landmark   Landmark @relation(fields: [landmarkId], references: [id])
 
-  @@unique([userId, landmarkId]) // A user can only add a place once
+  @@unique([userId, landmarkId]) 
 }
 
 model UserBadge {
@@ -56,5 +64,5 @@ model UserBadge {
   user       User     @relation(fields: [userId], references: [id])
   landmark   Landmark @relation(fields: [landmarkId], references: [id])
 
-  @@unique([userId, landmarkId]) // A user earns one badge per location
+  @@unique([userId, landmarkId]) 
 }

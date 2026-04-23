@@ -8,7 +8,8 @@ async function bootstrap() {
   app.enableCors();
 
   // Start the server on port 3000
-  await app.listen(3000);
+  await app.listen(3000, '0.0.0.0');
   console.log(`🚀 Cavite Explorer Backend is running on: http://localhost:3000`);
 }
 bootstrap();
+
