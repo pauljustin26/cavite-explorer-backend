@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, UseGuards } from '@nestjs/common';
 import { PlacesService } from './places.service';
 import { NeonGuard } from '../auth/neon.guard';
 
@@ -11,11 +11,16 @@ export class PlacesController {
     return this.placesService.findAll();
   }
 
-  // 2. Use the new NeonGuard instead of the old JwtAuthGuard!
   @UseGuards(NeonGuard) 
   @Post()
   addPlace(@Body() placeData: any) {
-    console.log('Received new place from Admin UI:', placeData);
     return this.placesService.create(placeData);
+  }
+
+  // NEW: The Edit Route!
+  @UseGuards(NeonGuard)
+  @Put(':id')
+  updatePlace(@Param('id') id: string, @Body() placeData: any) {
+    return this.placesService.update(id, placeData);
   }
 }

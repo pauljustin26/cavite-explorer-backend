@@ -1,53 +1,54 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Pool } from 'pg';
-import * as crypto from 'crypto'; // Built into Node.js, perfect for generating IDs!
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PlacesService {
-  private pool: Pool;
+  constructor(private prisma: PrismaService) {}
 
-  constructor() {
-    this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false,
-      },
-    });
-  }
-
-  // Fetch all places from your existing Landmark table
   async findAll() {
     try {
-      // Notice the double quotes around "Landmark"!
-      const result = await this.pool.query('SELECT * FROM "Landmark" ORDER BY name ASC');
-      return result.rows;
+      return await this.prisma.landmark.findMany({
+        orderBy: { name: 'asc' },
+      });
     } catch (error) {
-      console.error('Database Fetch Error:', error);
       throw new InternalServerErrorException('Failed to fetch historical places.');
     }
   }
 
-  // Insert a new place into your Landmark table
+  // UPDATED: Now accepts images array and badgeImage
   async create(placeData: any) {
-    const { name, municipality, description, latitude, longitude } = placeData;
-    
-    // Generate a unique ID and current timestamp for your columns
-    const newId = crypto.randomUUID(); 
-    const now = new Date();
+    const { name, municipality, description, latitude, longitude, images, badgeImage } = placeData;
 
     try {
-      const query = `
-        INSERT INTO "Landmark" (id, name, municipality, description, latitude, longitude, "updatedAt")
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING *;
-      `;
-      const values = [newId, name, municipality, description, latitude, longitude, now];
-      
-      const result = await this.pool.query(query, values);
-      return result.rows[0]; 
+      return await this.prisma.landmark.create({
+        data: {
+          name, municipality, description, latitude, longitude,
+          images: images || [], // Default to empty array if none provided
+          badgeImage: badgeImage || '', 
+        },
+      });
     } catch (error) {
       console.error('Database Insert Error:', error);
-      throw new InternalServerErrorException('Failed to save the location to the database.');
+      throw new InternalServerErrorException('Failed to save the location.');
+    }
+  }
+
+  // NEW: Update an existing place!
+  async update(id: string, placeData: any) {
+    const { name, municipality, description, latitude, longitude, images, badgeImage } = placeData;
+
+    try {
+      return await this.prisma.landmark.update({
+        where: { id }, // Find the row by its ID
+        data: {
+          name, municipality, description, latitude, longitude,
+          images: images || [], 
+          badgeImage: badgeImage || '',
+        },
+      });
+    } catch (error) {
+      console.error('Database Update Error:', error);
+      throw new InternalServerErrorException('Failed to update the location.');
     }
   }
 }
